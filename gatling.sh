@@ -25,18 +25,25 @@ while getopts ":b:s:" o; do
         ;;
         s) scenario=${OPTARG}
         ;;
+        l) local_run=${OPTARG}
+        ;;
     esac
 done
 
 # get current working directory
 dir=$(pwd)
+if [[ -z "$local_run" ]];then
 
-if [[ -z "$branch" ]];then
-  git checkout master
-  git pull origin master
+  if [[ -z "$branch" ]];then
+    git checkout master
+    git pull origin master
+  else
+    git checkout $branch
+    git pull origin $branch
+  fi
 else
-  git checkout $branch
-  git pull origin $branch
+    #don't do anything with branches and leave that shit alone
+    echo "nothing to see here, move along"
 fi
 
 if [[ -z "$scenario" ]];then
