@@ -1,5 +1,9 @@
 #/bin/bash
-
+## Arguments:
+##  -b  <branch_name> 
+##      This will switch to the branch that your test exists in
+##  -s <scenario_name>
+##      This will execute the scenario passed, otherwise it'll be interactive in scenario selection
 
 # check to make sure docker is installed
 
@@ -14,19 +18,28 @@ if [[ -z "$(docker images -q gatling:latest)" ]]; then
   docker build -t gatling .
 fi
 
-# make sure we pull the latest repo if requested (flag --update)
-if [[ "$1" == "--update" ]]; then
-  git pull origin master
-fi
+	
+while getopts ":b:s:" o; do
+    case "${o}" in
+        b) branch=${OPTARG}
+        ;;
+        s) scenario=${OPTARG}
+        ;;
+    esac
+done
 
 # get current working directory
 dir=$(pwd)
 
-# start the container
-if [[ "$1" == "-s" ]];then
-  docker run -v ${dir}/results:/opt/gatling/results -v ${dir}/user-files:/opt/gatling/user-files -it gatling -s ${2}
-elif [[ "$2" == "-s" ]];then
-  docker run -v ${dir}/results:/opt/gatling/results -v ${dir}/user-files:/opt/gatling/user-files -it gatling -s ${3}
-else 
-  docker run -v ${dir}/results:/opt/gatling/results -v ${dir}/user-files:/opt/gatling/user-files -it gatling
+if [[ -z "$branch" ]];then
+  git pull origin master
+else
+  git pull origin $branch
 fi
+
+if [[ -z "$scenario" ]];then
+  docker run -v ${dir}/results:/opt/gatling/results -v ${dir}/user-files:/opt/gatling/user-files -it gatling
+else
+  docker run -v ${dir}/results:/opt/gatling/results -v ${dir}/user-files:/opt/gatling/user-files -it gatling -s ${scenario}
+fi
+ 
