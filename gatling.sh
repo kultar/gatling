@@ -34,6 +34,7 @@ dir=$(pwd)
 if [[ -z "$branch" ]];then
   git pull origin master
 else
+  git checkout origin $branch
   git pull origin $branch
 fi
 
