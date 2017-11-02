@@ -32,10 +32,10 @@ done
 dir=$(pwd)
 
 if [[ -z "$branch" ]];then
-  git checkout origin master
+  git checkout master
   git pull origin master
 else
-  git checkout origin $branch
+  git checkout $branch
   git pull origin $branch
 fi
 
